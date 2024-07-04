@@ -30,7 +30,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-
 		//XYZ各軸の回転成分
 		Vector3 rotate{ 0.4f, 1.43f, -0.8f };
 		//X軸回転行列を作る
