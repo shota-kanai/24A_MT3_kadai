@@ -36,3 +36,5 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 	Matrix4x4 MakeRotateXMatrix(float radian);
 	Matrix4x4 MakeRotateYMatrix(float radian);
 	Matrix4x4 MakeRotateZMatrix(float radian);
+	//アフィン変換
+	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);

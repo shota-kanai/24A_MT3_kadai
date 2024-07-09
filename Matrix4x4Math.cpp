@@ -13,12 +13,12 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label)
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {
 	Novice::ScreenPrintf(
-		x , y -20 , "%s", label
+		x , y  , "%s", label
 	);
 	for (int row = 0; row < 4; ++row) {
 		for (int column = 0; column < 4; ++column) {
 			Novice::ScreenPrintf(
-				x + column * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][column]
+				x + column * kColumnWidth, y + row * kRowHeight+20, "%6.02f", matrix.m[row][column]
 			);
 		}
 	}
@@ -282,6 +282,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	return result;
 }
 
+//X軸の回転行列
 Matrix4x4 MakeRotateXMatrix(float radian) {
 	float cosTheta = cosf(radian);
 	float sinTheta = sinf(radian);
@@ -293,6 +294,7 @@ Matrix4x4 MakeRotateXMatrix(float radian) {
 	};
 }
 
+//Y軸の回転行列
 Matrix4x4 MakeRotateYMatrix(float radian) {
 	float cosTheta = cos(radian);
 	float sinTheta = sin(radian);
@@ -304,6 +306,7 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 	};
 }
 
+//Z軸の回転行列
 Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	float cosTheta = cos(radian);
@@ -314,4 +317,31 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 		0.0f,       0.0f,   0.0f, 0.0f,
 		0.0f,       0.0f,   0.0f, 1.0f 
 	};
+}
+
+//アフィン変換
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate)
+{
+
+	Matrix4x4 result = Multiply(
+		Multiply(MakeRotateXMatrix(rotate.x), MakeRotateYMatrix(rotate.y)),
+		MakeRotateZMatrix(rotate.z));
+	result.m[0][0] *= scale.x;
+	result.m[0][1] *= scale.x;
+	result.m[0][2] *= scale.x;
+
+	result.m[1][0] *= scale.y;
+	result.m[1][1] *= scale.y;
+	result.m[1][2] *= scale.y;
+
+	result.m[2][0] *= scale.z;
+	result.m[2][1] *= scale.z;
+	result.m[2][2] *= scale.z;
+
+	result.m[3][0] = translate.x;
+	result.m[3][1] = translate.y;
+	result.m[3][2] = translate.z;
+
+	return result;
+
 }

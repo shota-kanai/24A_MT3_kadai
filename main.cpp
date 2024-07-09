@@ -30,16 +30,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		//XYZ各軸の回転成分
+		//拡大縮小成分ベクトル
+		Vector3 scale{ 1.2f, 0.79f, -2.1f };
+		//回転成分ベクトル
 		Vector3 rotate{ 0.4f, 1.43f, -0.8f };
-		//X軸回転行列を作る
-		Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
-		//Y軸回転行列を作る
-		Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
-		//Z軸回転行列を作る
-		Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-		//XYZ各軸の回転行列を1つに合体する
-		Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+		//平行移動成分ベクトル
+		Vector3 translate{ 2.7f, -4.15f, 1.57f };
+		//↑の3つの成分からそれぞれの行列をつくり、さらにその行列を掛け算で1つにする
+		Matrix4x4 worldMatrix = MakeAffineMatrix(scale, rotate, translate);
 
 		///
 		/// ↑更新処理ここまで
@@ -49,11 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		MatrixScreenPrintf(0, 0, rotateXMatrix, "rotateXMatrix");
-		MatrixScreenPrintf(0, kRowHeight * 5, rotateYMatrix, "rotateYMatrix");
-		MatrixScreenPrintf(0, kRowHeight * 5 * 2, rotateZMatrix, "rotateZMatrix");
-		MatrixScreenPrintf(0, kRowHeight * 5 * 3, rotateXYZMatrix, "rotateXYZMatrix"); 
-
+		MatrixScreenPrintf(0, 0, worldMatrix, "worldMatrix");
 
 		///
 		/// ↑描画処理ここまで
