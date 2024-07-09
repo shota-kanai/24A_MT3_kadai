@@ -345,3 +345,38 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	return result;
 
 }
+
+//透視投影
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+	
+	float cotHalfFovV = 1.0f / std::tan(fovY / 2.0f);
+
+	return {
+		(cotHalfFovV / aspectRatio), 0.0f, 0.0f, 0.0f,
+		0.0f, cotHalfFovV, 0.0f, 0.0f,
+		0.0f, 0.0f, farClip / (farClip - nearClip), 1.0f,
+		0.0f, 0.0f, -(farClip * nearClip) / (farClip - nearClip), 0.0f
+	};
+}
+
+//正射影行列
+Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
+
+	return {
+		2.0f / (right - left), 0.0f, 0.0f, 0.0f,
+		0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f / (farClip - nearClip), 0.0f,
+		(left + right) / (left - right), (top + bottom) / (bottom - top), nearClip / (nearClip - farClip), 1.0f,
+	};
+}
+
+//ビューポート変換行列
+Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
+
+	return {
+		width / 2.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, -height / 2.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, maxDepth - minDepth, 0.0f,
+		left + width / 2.0f, top + height / 2.0f, minDepth, 1.0f,
+	};
+}
