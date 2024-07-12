@@ -66,10 +66,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		rotate.y += 0.03f;
 
 		Matrix4x4 worldMatrix =
-			MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, rotate, translate);
+			MakeAffineMatrixQueue({ 1.0f, 1.0f, 1.0f }, rotate, translate);
 
 		Matrix4x4 cameraMatrix =
-			MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, cameraPosition);
+			MakeAffineMatrixQueue({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, cameraPosition);
 
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 
