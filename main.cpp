@@ -3,6 +3,9 @@
 #include<Matrix4x4.h>
 #include <Vector3.h>
 #include <Matrix4x4Math.h>
+#define _USE_MATH_DEFINES
+
+#include <imgui.h>
 
 const char kWindowTitle[] = "GC1C_05_カナイショウタ_タイトル";
 
@@ -20,18 +23,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = { 0 };
 
 	//=============================================
-	Vector3 kLocalVertices[3] = {
-	  {-0.5f, -0.5f, 0.0f},
-	  {0.0f,  0.5f,  0.0f},
-	  {0.5f,  -0.5f, 0.0f},
-	};
-
-	Vector3 v1{ 1.2f, -3.9f, 2.5f };
-	Vector3 v2{ 2.8f, 0.4f, -1.3f };
-
-	Vector3 cameraPosition{ 0.0f, 0.0f, -5.0f };
+	
+	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
+	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
 	Vector3 rotate{};
 	Vector3 translate{};
+
+
+	Sphere sphere{};
+	sphere.radius = 30;
 
 	//=============================================
 
@@ -44,55 +44,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
+
 		///
 		/// ↓更新処理ここから
 		///
 
-		if (keys[DIK_W]) {
-			translate.z += 0.03f;
-		}
-		if (keys[DIK_S]) {
-			translate.z -= 0.03f;
-		}
-		if (keys[DIK_D]) {
-			translate.x += 0.03f;
-		}
-		if (keys[DIK_A]) {
-			translate.x -= 0.03f;
-		}
 
-		Vector3 cross = Cross(v1, v2);
 
-		rotate.y += 0.03f;
-
-		Matrix4x4 worldMatrix =
-			MakeAffineMatrixQueue({ 1.0f, 1.0f, 1.0f }, rotate, translate);
-
+		//カメラの拡大縮小、回転、平行移動ベクトルからカメラ空間の行列を作る
 		Matrix4x4 cameraMatrix =
-			MakeAffineMatrixQueue({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, cameraPosition);
+			MakeAffineMatrixQueue({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
 
+		//ビュー行列：
+		//カメラから見た視錐台空間に変換する行列。カメラ行列の逆行列
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 
+		//プロジェクション行列：
+		//ビュー空間の視錐台を幅と高さが2、奥行きが1の直方体空間に変換する行列
+		//この座標系を正規デバイス座標系という
 		Matrix4x4 projectionMatrix =
 			MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
-		Matrix4x4 worldViewProjectionMatrix =
-			Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		//ビュー行列とプロジェクション行列を掛けて1つの行列に
+			//物体の頂点にこれを掛けると平面に投影された2次元画像の座標になる
+		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
-		// ViewportMatrixを作る
+		
+
+		//ビューポート行列：
+		//投影面に投影された2次元映像を、スクリーン座標系で表された
+		//ウインドウ上の指定領域であるビューポート内に表示する変換行列
 		Matrix4x4 viewportMatrix =
 			MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-		// Screen空間へと頂点を変換する
-		Vector3 screenVertices[3];
-
-		for (uint32_t i = 0; i < 3; ++i) {
-			// NDCまで変換。Transformを使うと同次座標系->デカルト座標系の処理が行われ、結果的にZDivideが行われることになる
-			Vector3 ndcVertex = Transform(kLocalVertices[i], worldViewProjectionMatrix);
-			// Viewport変換を行ってScreen空間へ
-			screenVertices[i] = Transform(ndcVertex, viewportMatrix);
-		}
-
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		ImGui::End();
 
 		///
 		/// ↑更新処理ここまで
@@ -102,12 +92,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		Novice::DrawTriangle(
-			int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x),
-			int(screenVertices[1].y), int(screenVertices[2].x), int(screenVertices[2].y), RED,
-			kFillModeSolid);
-
-		VectorScreenPrintf(0, 0, cross, "Cross");
+		//ワールド空間の頂点×ビュープロジェクション行列×ビューポート行列で
+		//スクリーン空間の座標になる
+		DrawGrid(viewProjectionMatrix, viewportMatrix);
+		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, BLACK);
 
 		///
 		/// ↑描画処理ここまで

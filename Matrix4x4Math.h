@@ -4,14 +4,23 @@
 #include<Vector3.h>
 #include <math.h>
 #include<cmath>
+#include <numbers>
+
+
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
+
 //Vectorスクリーンプリント
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 //Matrixスクリーンプリント
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
+
+struct Sphere {
+	Vector3 center;//中心点
+	float radius;//半径
+};
 
 
 	//加算
@@ -48,3 +57,8 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 	Vector3 Cross(const Vector3& v1, const Vector3& v2);
 	//アフィン変換行列
 	Matrix4x4 MakeAffineMatrixQueue(const Vector3& scale, const Vector3& rot, const Vector3& translate);
+	//グリッド
+	void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+	//球体
+	void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+	
