@@ -5,7 +5,27 @@
 #include <math.h>
 #include<cmath>
 #include <numbers>
+#include <Vector2.h>
+#include <segment.h>
+#include <stdio.h>
 
+struct Segment
+{
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Line
+{
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Ray
+{
+	Vector3 origin;
+	Vector3 diff;
+};
 
 
 static const int kRowHeight = 20;
@@ -23,11 +43,11 @@ struct Sphere {
 };
 
 
-	//加算
+	//行列加算
 	Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
 	// 行列引き算
 	Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
-	//掛け算
+	//行列掛け算
 	Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 	//逆行列
 	Matrix4x4 Inverse(const Matrix4x4& m);
@@ -61,4 +81,25 @@ struct Sphere {
 	void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 	//球体
 	void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-	
+
+	struct SphericalCoordinate {
+		float theta;
+		float phi;
+		float radius;
+	};
+	//Vectorの加算
+	Vector3 AddV(const Vector3& v1, const Vector3& v2);
+	//Vectorの減算
+	Vector3 SubtractV(const Vector3& v1, const Vector3& v2);
+	//内積
+	float Dot(const Vector3& v1, const Vector3& v2);
+	//長さ
+	float Length(const Vector3& v);
+	//正規化
+	inline Vector3 Normalize(const Vector3& v);
+	//正射影ベクトル
+	Vector3 Project(const Vector3& v1, const Vector3& v2);
+	//最近接点
+	Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
+
+	Matrix4x4 MakeViewProjectionMatrix(Vector3 scale, Vector3 rotate, Vector3 translate, Vector3 cameraScale, Vector3 cameraRotate, Vector3 cameraTranslate);

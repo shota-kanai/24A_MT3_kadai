@@ -2,6 +2,8 @@
 
 using namespace std;
 
+
+
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label)
 {
 	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
@@ -502,3 +504,56 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 		}
 	}
 }
+
+//加算
+Vector3 AddV(const Vector3& v1, const Vector3& v2) {
+	return Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+
+}
+//減算
+Vector3 SubtractV(const Vector3& v1, const Vector3& v2) {
+	return Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
+//内積
+float Dot(const Vector3& v1, const Vector3& v2) {
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+//長さ
+float Length(const Vector3& v) {
+	return sqrtf(Dot(v, v));
+}
+//正規化
+inline Vector3 Normalize(const Vector3& v) {
+	float v2 = 0.0f;
+	v2 = Length(v);
+	return{ v.x / v2,v.y / v2,v.z / v2 };
+}
+
+//=-----------------------------------------------------------
+//正射影ベクトル
+Vector3 Project(const Vector3& v1, const Vector3& v2) {
+	Vector3 result{};
+
+	result.x = Dot(v1, Normalize(v2)) * Normalize(v2).x;
+	result.y = Dot(v1, Normalize(v2)) * Normalize(v2).y;
+	result.z = Dot(v1, Normalize(v2)) * Normalize(v2).z;
+
+	return result;
+}
+//最近接点
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+
+	return AddV(Project(SubtractV(point, segment.origin), segment.diff), segment.origin);
+
+}
+
+Matrix4x4 MakeViewProjectionMatrix(Vector3 scale, Vector3 rotate, Vector3 translate, Vector3 cameraScale, Vector3 cameraRotate, Vector3 cameraTranslate) {
+	Matrix4x4 worldMatrix = MakeAffineMatrixQueue(scale, rotate, translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrixQueue(cameraScale, cameraRotate, cameraTranslate);
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 720.0f / 1280.0f, 0.1f, 100.0f);
+	MatrixScreenPrintf(0, 0, viewMatrix, "viewprojection");
+	return (Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix)));
+
+}
+//=-----------------------------------------------------------
