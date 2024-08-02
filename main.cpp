@@ -17,6 +17,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
+	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
+	Vector3 cameraRotato{ 0.26f,0.0f,0.0f };
+
+	Sphere sphere;
+	sphere.center = { -10.0f, -40.0f, 162.0f };
+	sphere.radius = 30;
+
+	Sphere sphere2;
+	sphere2.center = { 40.0f, -40.0f,162.0f };
+	sphere2.radius = 20;
+
+	Vector3 rotate{};
+	Vector3 translate{};
+	Vector3 Scale = { 1.0f,1.0f,1.0f };
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
